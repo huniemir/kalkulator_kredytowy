@@ -109,13 +109,16 @@ class CalcCtrl{
 		getSmarty()->display('calc_view.tpl');
 	}
 
-	public function calculate(){
-		if(isset($_REQUEST['kredyt'])){
+	public function action_calcShow(){
+		$this->generateView();
+	}
+
+	public function action_calculate(){
 			$this->getParams();
-			$this->validate();
-			$this->process();
+			if($this->validate()){
+				$this->process();
+			}
 			$this->calcFinished = true;
-		}
 			$this->generateView();
 	}
 

@@ -21,9 +21,11 @@
 		
 		</select><br />
 		<input type="submit" value="Oblicz" class="pure-button pure-button-primary" />
+	</form>
+	<form action="{$conf->action_root}logout" method="post">
 		<input type="submit" value="Wyloguj" name="wyloguj" class="button-secondary pure-button" />
-
-	</form>	
+	</form>
+	
 </div>
 
 {if isset($messages)}
