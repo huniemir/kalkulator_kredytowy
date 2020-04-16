@@ -22,40 +22,49 @@ class CalcCtrl{
 
 	private function validate(){
 
-	if ( ! (isset($this->form->kredyt) && isset($this->form->lata) && isset($this->form->oprocentowanie) && isset($this->form->rodzaj_raty))) {
-		getMessages()->addError('Wszystkie pola muszą być wypełnione!');
-		return false;
+		if ( ! (isset($this->form->kredyt) && isset($this->form->lata) && isset($this->form->oprocentowanie) && isset($this->form->rodzaj_raty))) {
+			getMessages()->addError('Wszystkie pola muszą być wypełnione!');
+			return false;
+			}
+		if ( $this->form->kredyt == "") {
+			getMessages()->addError('Nie podano kwoty kredytu');
+			return false;
 		}
-	if ( $this->form->kredyt == "") {
-		getMessages()->addError('Nie podano kwoty kredytu');
-		return false;
-	}
-	if ( $this->form->lata == "") {
-		getMessages()->addError('Nie podano na jak długo pobierany jest kredyt'); 
-		return false;
-	}
-	if ( $this->form->oprocentowanie == "") {
-		$this->msgs->addError('Nie podano wysokości oprocentowania');
-		return false;
+		if ( $this->form->lata == "") {
+			getMessages()->addError('Nie podano na jak długo pobierany jest kredyt'); 
+			return false;
+		}
+		if ( $this->form->oprocentowanie == "") {
+			$this->msgs->addError('Nie podano wysokości oprocentowania');
+			return false;
+		}
+
+		if (empty($this->messages)) {
+			if (! is_numeric( $this->form->kredyt )) {
+				getMessages()->addError('Kwota kredytu musi być liczbą całkowitą');
+				return false;
+			}
+			if (! is_numeric( $this->form->lata )) {
+				getMessages()->addError('Ilość lat musi być liczbą całkowitą');
+				return false;
+			}	
+			if (! is_numeric( $this->form->oprocentowanie )) {
+			    getMessages()->addError('Oprocentowanie musi być liczbą całkowitą');
+				return false;
+			}
+				return true;
+		}
 	}
 
-	if (empty($this->messages)) {
-		if (! is_numeric( $this->form->kredyt )) {
-			getMessages()->addError('Kwota kredytu musi być liczbą całkowitą');
-			return false;
-		}
-		if (! is_numeric( $this->form->lata )) {
-			getMessages()->addError('Ilość lat musi być liczbą całkowitą');
-			return false;
-		}	
-		if (! is_numeric( $this->form->oprocentowanie )) {
-		    getMessages()->addError('Oprocentowanie musi być liczbą całkowitą');
-			return false;
-		}
-			return true;
+	private function saveResult(){
+		getDB()->insert("result", [
+			"rata" => $this->result->rata,
+			"suma" => $this->result->suma,
+			"odsetki" => $this->result->odsetki
+		]);
 	}
 
-	}
+	
 	private function process(){
 	if (getMessages()->isEmpty()) {
 		$this->form->kredyt = doubleval($this->form->kredyt);
@@ -91,6 +100,8 @@ class CalcCtrl{
 				$this->result->suma = $this->form->kredyt + $this->result->rata * $this->form->lata;
 				$this->result->suma = doubleval($this->result->suma);
 				$this->result->odsetki = $this->result->suma - $this->form->kredyt;
+
+				$this->saveResult();
 
 		return true;
 		}
